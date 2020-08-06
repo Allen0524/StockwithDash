@@ -3,6 +3,7 @@
 from data import Data
 import plotly.express as px
 import plotly.graph_objects as go
+import math
 
 
 def modifMonthtoSeason(s):
