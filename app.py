@@ -17,6 +17,7 @@ import plotly.graph_objects as go
 import pandas_datareader as pdr
 from talib import abstract
 import plotly.express as px
+from plotly.subplots import make_subplots
 from  formulation import getPB, getOneSeasonEPS, getMonthRevenue, getCashFlow, getIncomeTable
 
 
@@ -146,6 +147,14 @@ row2 = html.Div([
             html.Div(children=[
                     html.Div(["K線"], className="card-header fontStyle"),
                     html.Div([
+                        html.H4(id='k-text'),
+                        dcc.RangeSlider(
+                            id='k-slider',
+                            min=2016,
+                            max=2020,
+                            step=1,
+                            value=[2019]
+                        ),
                         dcc.Graph(
                             id='k-fig', figure={}
                         )
@@ -219,11 +228,13 @@ app.layout = html.Div([
     Output('incomeStatement-fig', 'figure'),
     Output('k-fig', 'figure'),
     Output('RSI-fig', 'figure'),
-    Output('SMA-fig', 'figure')],
-    [Input('sId-Btn', 'n_clicks')],
+    Output('SMA-fig', 'figure'),
+    Output('k-text', 'children')],
+    [Input('sId-Btn', 'n_clicks'),
+    Input('k-slider', 'value')],
     [State('sId-Input', 'value')]
 )
-def update_basic_info(n_clicks, input_value):
+def update_basic_info(n_clicks, year, input_value):
     
     data = Data()
     conn = sqlite3.connect('dataBase.db')
@@ -247,7 +258,8 @@ def update_basic_info(n_clicks, input_value):
     incometableFigure = getIncomeTable(strid)
 
     #技術圖
-    date = '2019-01-01'
+    
+    date = str(year[0])+'-01-01'
     df = pdr.DataReader(str(strid)+'.TW', 'yahoo', start=date)
     fig = go.Figure(data=go.Candlestick(x=df.index,
                     open=df['Open'],
@@ -261,7 +273,10 @@ def update_basic_info(n_clicks, input_value):
 
     #RSI
     RSI = abstract.RSI(alldf)
-    rsifig = px.line(RSI)
+    #rsifig = px.line(RSI)
+    rsifig = go.Scatter(x=RSI.index, y=RSI.values)
+
+    tf = make_subplots(specs=[[{"secondary_y": True}]])
 
     #STOCH
     STOCH = abstract.STOCH(alldf)
@@ -271,7 +286,7 @@ def update_basic_info(n_clicks, input_value):
     SMA = abstract.SMA(alldf)
     SMAfig = px.line(SMA)
     
-    return sName, sPrice, sNumber, sPER, sPBR, sEPS, sClose, revenueFig, epsFigure, chasflowFigure, incometableFigure, fig, stochfig, SMAfig
+    return sName, sPrice, sNumber, sPER, sPBR, sEPS, sClose, revenueFig, epsFigure, chasflowFigure, incometableFigure, fig, stochfig, SMAfig, year[0]
 
 
 if __name__ == "__main__":
