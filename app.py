@@ -153,7 +153,7 @@ row2 = html.Div([
                             min=2016,
                             max=2020,
                             step=1,
-                            value=[2019]
+                            value=[2020]
                         ),
                         dcc.Graph(
                             id='k-fig', figure={}
@@ -198,10 +198,15 @@ app.layout = html.Div([
                     html.H3(id='sName', children="", className='fontStyle')
                 ], className="nav-item active")
             ], className="navbar-nav mr-auto"),
-            html.Form([
+            html.Div([
                 dcc.Input(id='sId-Input', value='2330', type='number', placeholder='StockId', className="form-control mr-sm-2"),
-                html.Button(id='sId-Btn', children="search", n_clicks=0, className="btn btn-secondary my-2 my-sm-0")
-            ], className="form-inline my-2 my-lg-0")
+                html.Button(id='sId-Btn', children="search", n_clicks=0, className="btn btn-secondary my-2 my-sm-0"),
+            ], className="form-inline my-2 my-lg-0"),
+            #用FORM會出問題
+            #html.Form([
+                #dcc.Input(id='sId-Input', value='2330', type='number', placeholder='StockId', className="form-control mr-sm-2"),
+                #html.Button(id='sId-Btn', children="search", n_clicks=0, className="btn btn-secondary my-2 my-sm-0")
+            #], className="form-inline my-2 my-lg-0")
         ], className="collapse navbar-collapse")
 
     ], className="navbar navbar-expand-lg navbar-dark bg-primary"),
@@ -285,6 +290,7 @@ def update_basic_info(n_clicks, year, input_value):
     #SMA
     SMA = abstract.SMA(alldf)
     SMAfig = px.line(SMA)
+    
     
     return sName, sPrice, sNumber, sPER, sPBR, sEPS, sClose, revenueFig, epsFigure, chasflowFigure, incometableFigure, fig, stochfig, SMAfig, year[0]
 
